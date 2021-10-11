@@ -1,5 +1,21 @@
 # TLS study in python  
-  
+
+## Requirements
+
+- `gmpy2`
+
+	```shell
+	# Mac
+	brew install gmp
+	brew install mpfr
+	brew install libmpc
+	pip install gmpy2
+	# To include library path in brew in pip install
+	pip install --global-option=build_ext \
+		--global-option="-I/opt/homebrew/include" \
+		--global-option="-L/opt/homebrew/lib" gmpy2  
+	```
+
 ## Key-Exchange  
   
 ### ECDHE (Elliptic Curve Diffie Hellman Ephemeral)
