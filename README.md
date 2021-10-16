@@ -94,3 +94,43 @@ RSA를 이용하여 인증을 했을 때 가질 수 있는 의문은 Public Key�
 
 > A라는 기관으로부터 인증을 받은 경우, A는 B로부터 인증을 받았을 수 있다. 이 관계가 Certificate Chain이며 계속해서 상위 인증 정보로 올라가다보면 Root Certificate 기관을 확인할 수 있다. Root Certificate 기관은 스스로 서명 (Self-Signed) 하였으며 브라우저나 OS에는 기본적으로 믿을 수 있는 최상위 인증 기관들에 대한 정보를 저장하고 있어 Root Certificate 기관들을 확인할 수 있다.
 
+### ECDSA
+
+ECDHE와 마찬가지로 Elliptic Curve를 사용하며 Public Key, Private Key를 통해 암호화를 한다. 먼저 주어진 메시지를 바탕으로 Signature를 생성하는 과정은 다음과 같다.
+
+#### Sign
+
+1. Elliptic Curve l을 결정하고 차수 n, Generator Point G를 결정
+2. d < n을 만족하는 양의 자연수 d를 선택하여 **Private Key**로 사용
+3. Public Key `Q = d x G` 계산
+4. k < n을 만족하는 양의 자연수 k를 선택
+5. **Signature r**: k x G의 x좌표를 n에 대해 나머지 연산을 취한 값 r을 계산
+6. 주어진 메시지를 해싱 후 n의 Bit 수에 맞게 MSB Slice한 z 계산
+7. **Signature s**: `s = k^-1 x (z + rd) mod n`
+8. Public Key, Message, Signature(r, s) 전달
+
+#### Verify
+
+1. 서명할 때와 동일하게 메시지로부터 z 계산
+2. Elliptic Curve, Public Key가 유효한지 확인
+3. `P = uG + vQ` 계산
+    - `u = s^-1 x z`
+    - `v = s^-1 x r`
+4. 계산된 P의 x좌표를 n에 대해 나머지 연산한 값이 r이면 유효한 서명
+
+### RSA vs ECDSA?
+
+1. 기반 지식
+   - RSA: 소인수분해가 어렵다는 것을 이용해 큰 두 소수의 곱을 사용
+   - ECDSA: 타원 곡선에서의 정해진 연산 사용
+2. 인기
+   - RSA: ECDSA에 비해 10년 정도 이전부터 사용하였으며 굉장히 범용적으로 사용 중
+   - ECDSA: RSA에 비해서는 적게 사용되고 있으나 최근 들어 점진적으로 더 적용하기 시작
+     - 암호화폐에서 서명 알고리즘으로 ECDSA를 사용
+3. 장점
+   - RSA: 간단한 구현
+   - ECDSA: RSA와 동일한 난이도의 암호화를 적용할 수 있으면서 훨씬 짧은 키 사용
+
+Bit 수가 늘어남에 따라 키, 전달하는 메시지의 기하급수적으로 사이즈가 커지는 RSA와는 달리 ECDSA는 훨씬 적은 양의 비트 수만을 사용하는 특성은 네트워크 트래픽을 적게 차지하며 빠르게 주고 받을 수 있게 해주기 때문에 최근 들어서 ECDSA를 사용하는 추세이다.
+
+- 관련 내용 [링크](https://sectigostore.com/blog/ecdsa-vs-rsa-everything-you-need-to-know/)
